@@ -39,9 +39,9 @@ def searchMovie(query):
         print(f"Error: {response.status_code}")
         return []
 
-def getMovie(movie_id):
+def getMovie(movieID):
     
-    url = f"{baseURL}/movie/{movie_id}"
+    url = f"{baseURL}/movie/{movieID}"
     
     params = {
         "api_key": apiKey,

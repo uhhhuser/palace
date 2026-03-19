@@ -4,92 +4,67 @@
     <meta charset="UTF-8">
     <title>Search Movies</title>
     <style>
-        /* Simple styling for the movie grid */
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .movie-card {
-            text-align: center;
-        }
-        
-        .movie-card img {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .movie-card .title {
-            font-weight: bold;
-            margin-top: 8px;
-            font-size: 14px;
-        }
-        
-        .movie-card .year {
-            color: #666;
-            font-size: 12px;
-        }
-        
-        .no-poster {
-            width: 100%;
-            height: 225px;
-            background: #ddd;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 12px;
-        }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .search-box { text-align: center; margin-bottom: 30px; }
+        input[type="text"] { padding: 10px; width: 300px; }
+        button { padding: 10px 20px; }
+        .movie { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
+        .movie img { width: 100px; margin-right: 20px; }
+        .movie-info h3 { margin: 0 0 10px 0; }
+        .nav { margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h1>Search Movies</h1>
-    
-    <!-- Search Form -->
-    <form action="/search" method="GET">
-        <input 
-            type="text" 
-            name="query" 
-            placeholder="Search for a movie..." 
-            value="{{ query }}"
-            style="padding: 8px; width: 300px;"
-        >
-        <button type="submit" style="padding: 8px 16px;">Search</button>
-    </form>
+    <div class="nav">
+        <a href="{{ url_for('home') }}">Home</a>
+    </div>
 
-    <!-- Results -->
+    <div class="search-box">
+        <form method="get" action="{{ url_for('search') }}">
+            <input type="text" name="query" value="{{ query }}" placeholder="Search for movies...">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
     {% if query %}
-        <h2>Results for "{{ query }}":</h2>
-        
+        <h2>Results for "{{ query }}"</h2>
         {% if results %}
-            <div class="movie-grid">
             {% for movie in results %}
-                <div class="movie-card">
-                    <!-- Poster Image -->
+                <div class="movie">
                     {% if movie.posterURL %}
-                        <img src="{{ movie.posterURL }}" alt="{{ movie.title }} poster">
-                    {% else %}
-                        <div class="no-poster">No Poster</div>
+                        <img src="{{ movie.posterURL }}" alt="{{ movie.title }}">
                     {% endif %}
-                    
-                    <!-- Movie Info -->
-                    <div class="title">{{ movie.title }}</div>
-                    <div class="year">
-                        {{ movie.release_date[:4] if movie.release_date else 'Unknown' }}
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                        <p>{{ movie.overview or 'No description available.' }}</p>
+                        <p>Rating: {{ movie.vote_average or 'N/A' }}</p>
+                        <form method="POST" action="{{ url_for('movies.addMovie') }}" style="display: inline;">
+                            <input type="hidden" name="tmdb_id" value="{{ movie.id }}">
+                            <input type="hidden" name="title" value="{{ movie.title }}">
+                            <input type="hidden" name="poster" value="{{ movie.posterURL or '' }}">
+                            <input type="hidden" name="status" value="watchlist">
+                            <button type="submit">Watchlist</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('movies.addMovie') }}" style="display: inline;">
+                            <input type="hidden" name="tmdb_id" value="{{ movie.id }}">
+                            <input type="hidden" name="title" value="{{ movie.title }}">
+                            <input type="hidden" name="poster" value="{{ movie.posterURL or '' }}">
+                            <input type="hidden" name="status" value="watching">
+                            <button type="submit">Watching</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('movies.addMovie') }}" style="display: inline;">
+                            <input type="hidden" name="tmdb_id" value="{{ movie.id }}">
+                            <input type="hidden" name="title" value="{{ movie.title }}">
+                            <input type="hidden" name="poster" value="{{ movie.posterURL or '' }}">
+                            <input type="hidden" name="status" value="watched">
+                            <button type="submit">Watched</button>
+                        </form>
                     </div>
                 </div>
             {% endfor %}
-            </div>
         {% else %}
             <p>No movies found.</p>
         {% endif %}
     {% endif %}
-
-    <br><br>
-    <a href="/">← Back to Home</a>
 </body>
 </html>
