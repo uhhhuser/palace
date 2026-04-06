@@ -9,7 +9,7 @@ movies = Blueprint('movies', __name__)
 @movies.route('/add', methods=['POST'])
 @jwt_required()
 def add_movie():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     
     data = request.get_json()
@@ -59,7 +59,7 @@ def add_movie():
 @movies.route('/remove/<int:movie_id>', methods=['POST'])
 @jwt_required()
 def remove_movie(movie_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     
     data = request.get_json()
@@ -90,7 +90,7 @@ def remove_movie(movie_id):
 @movies.route('/my-movies', methods=['GET'])
 @jwt_required()
 def get_my_movies():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user_lists = movielist.query.filter_by(userID=user_id).all()
     
     return jsonify({

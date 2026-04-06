@@ -9,7 +9,7 @@ lists = Blueprint('lists', __name__)
 @lists.route('/', methods=['GET'])
 @jwt_required()
 def get_user_lists():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user_lists = movielist.query.filter_by(userID=user_id).all()
     
     return jsonify({
@@ -20,7 +20,7 @@ def get_user_lists():
 @lists.route('/', methods=['POST'])
 @jwt_required()
 def create_list():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     list_name = data.get('name', '').strip()
     

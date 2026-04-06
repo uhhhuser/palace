@@ -9,7 +9,7 @@ clubs = Blueprint('clubs', __name__)
 @clubs.route('/', methods=['GET'])
 @jwt_required()
 def get_clubs():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     
     return jsonify({
@@ -21,7 +21,7 @@ def get_clubs():
 @clubs.route('/', methods=['POST'])
 @jwt_required()
 def create_club():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
     club_name = data.get('name', '').strip()
     description = data.get('description', '')
@@ -61,7 +61,7 @@ def get_club(club_id):
 @clubs.route('/<int:club_id>/join', methods=['POST'])
 @jwt_required()
 def join_club(club_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     club_obj = club.query.get_or_404(club_id)
     
@@ -77,7 +77,7 @@ def join_club(club_id):
 @clubs.route('/<int:club_id>/leave', methods=['POST'])
 @jwt_required()
 def leave_club(club_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     club_obj = club.query.get_or_404(club_id)
     
@@ -93,7 +93,7 @@ def leave_club(club_id):
 @clubs.route('/<int:club_id>/lists', methods=['POST'])
 @jwt_required()
 def create_club_list(club_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = user.query.get(user_id)
     club_obj = club.query.get_or_404(club_id)
     
@@ -119,7 +119,7 @@ def create_club_list(club_id):
 @clubs.route('/<int:club_id>', methods=['DELETE'])
 @jwt_required()
 def delete_club(club_id):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     club_obj = club.query.get_or_404(club_id)
     
     if club_obj.admin_id != user_id:

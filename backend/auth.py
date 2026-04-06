@@ -29,7 +29,7 @@ def signup():
     db.session.commit()
 
     # fixes the login issue (fuck duran)
-    access_token = create_access_token(identity=new_user.id)
+    access_token = create_access_token(identity=str(new_user.id))
     
     return jsonify({
         'message': 'Account created successfully',
@@ -54,7 +54,7 @@ def login():
     if not log_user:
         return jsonify({'error': 'User not found'}), 404
 
-    access_token = create_access_token(identity=log_user.id)
+    access_token = create_access_token(identity=str(log_user.id))
     
     return jsonify({
         'message': 'Login successful',
@@ -69,7 +69,7 @@ def login():
 @auth.route('/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     current_user = User.query.get(user_id)
     
     if not current_user:
