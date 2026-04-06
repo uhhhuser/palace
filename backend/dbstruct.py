@@ -63,7 +63,7 @@ class club(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200))
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    admin_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # club owns multiple lists (if club is gone, lists are gone) 
@@ -88,7 +88,7 @@ class club(db.Model):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'creator_id': self.creator_id,
+            'admin_id': self.admin_id,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
         
