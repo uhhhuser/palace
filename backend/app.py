@@ -8,6 +8,7 @@ from auth import auth
 from watchlist import movies
 from lists import lists
 from clubs import clubs
+from notifications import notifications
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'dev-secret-key-change-in-production'
@@ -24,6 +25,7 @@ app.register_blueprint(auth, url_prefix='/api/auth')
 app.register_blueprint(movies, url_prefix='/api/movies')
 app.register_blueprint(lists, url_prefix='/api/lists')
 app.register_blueprint(clubs, url_prefix='/api/clubs')
+app.register_blueprint(notifications, url_prefix='/api/notifications')
 
 # route here
 @app.route('/api/')

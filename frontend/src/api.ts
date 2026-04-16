@@ -30,6 +30,10 @@ export interface SearchResponse {
 export interface AuthResponse {
   access_token: string;
   message?: string;
+  user?: {
+    id: number;
+    nickname: string;
+  };
 }
 
 export interface User {
@@ -59,6 +63,7 @@ export const searchMovies = (search: string): Promise<SearchResponse> =>
   fetch(`${API_BASE}/search?query=${encodeURIComponent(search)}`).then(r => r.json());
 
 // auth
+// Note: Backend uses 'nickname' as the username field for both login and signup
 export const login = (nickname: string): Promise<AuthResponse> =>
   fetch(`${API_BASE}/auth/login`, {
     method: 'POST',

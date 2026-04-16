@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import backref
 
 db = SQLAlchemy()
@@ -25,7 +25,6 @@ class user(db.Model):
     # relationships
     movies = db.relationship('movie', backref='author', lazy=True)
     clubs = db.relationship('club', secondary=club_members, backref='members', lazy=True)
-
     def __repr__(self):
         return f"User('{self.nickname}')"
 
@@ -68,7 +67,7 @@ class club(db.Model):
 
     # club owns multiple lists (if club is gone, lists are gone) 
     lists = db.relationship('movielist', backref='club', lazy=True, cascade='all, delete-orphan')
-
+    
     def __repr__(self):
         return f"Club('{self.name}')"
 
@@ -83,7 +82,7 @@ class club(db.Model):
         if user in self.members:
             self.members.remove(user)
 
-    def to_dict(self, include_members=False, include_lists=False):
+    def to_dict(self, include_members=False, include_lists=False, include_name_history=False):
         data = {
             'id': self.id,
             'name': self.name,
@@ -100,7 +99,36 @@ class club(db.Model):
         if include_lists:
             data['lists'] = [lst.to_dict() for lst in self.lists]
         
+        if include_name_history:
+            data['name_history'] = self.get_name_history()
+        
         return data
+    
+    def get_name_history(self):
+        return [
+            {
+                'name': h.old_name,
+                'changed_at': h.changed_at.isoformat() if h.changed_at else None,
+                'changed_by': h.changed_by_user_id
+            }
+            for h in self.name_history.order_by(club_name_history.changed_at.desc()).all()
+        ]
+
+
+class club_name_history(db.Model):
+    __tablename__ = 'club_name_history'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    club_id = db.Column(db.Integer, db.ForeignKey('clubs.id'), nullable=False)
+    old_name = db.Column(db.String(50), nullable=False)
+    changed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    changed_by_user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    club = db.relationship('club', backref=db.backref('name_history', lazy='dynamic', cascade='all, delete-orphan'))
+    
+    def __repr__(self):
+        return f"ClubNameHistory('{self.old_name}', club_id={self.club_id})"
+
 
 # lists
 class movielist(db.Model):
